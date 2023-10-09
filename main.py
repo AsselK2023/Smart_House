@@ -33,6 +33,15 @@ class LightingStrategy(Strategy):
 # controller.py
 from typing import List
 
+# decorator
+def require_strategy(func):
+    def wrapper(controller, device_name):
+        if not controller.strategy:
+            print("No strategy set. Please set a strategy first.")
+        else:
+            func(controller, device_name)
+    return wrapper
+
 class HomeController:
     def __init__(self):
         self.devices: List[Device] = []
@@ -44,18 +53,14 @@ class HomeController:
     def set_strategy(self, strategy: Strategy):
         self.strategy = strategy
 
+    @require_strategy  
     def control_device(self, device_name: str):
-        if not self.strategy:
-            print()
-            return
-
         for device in self.devices:
             if device.name.lower() == device_name.lower():
                 self.strategy.execute(device)
                 break
         else:
             print(f"Device {device_name} not found.")
-
 
 if __name__ == "__main__":
     controller = HomeController()
